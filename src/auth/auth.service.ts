@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Auth, AuthDocument } from './auth.schema';
 import { Model } from 'mongoose';
@@ -6,6 +6,7 @@ import { SignupDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { Request, Response } from 'express';
+import { AuthenticatedRequest } from './auth.guard';
 
 const EXPIRES = {
     AT: (30 * 24 * 60 * 60) * 1000, // 30 Days in milliseconds
@@ -19,31 +20,76 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async signup(signupDto: SignupDto) : Promise<AuthDocument>{
+    async signup(signupDto: SignupDto, res: Response) : Promise<Response>{
         try {
-            const user = new this.authModel(signupDto)
-            await user.save()
-            return user
+            const auth = new this.authModel(signupDto)
+            await auth.save()
+            return this.getToken(auth, res)
         }
         catch(error)
         {
-            console.log(error)
             throw new InternalServerErrorException(error)
         }
     }
 
-    private async getToken(auth: any, res: Response) {
+    async logout(req: Request, res: Response): Promise<Response> {
+        try {      
+          res.clearCookie('__OTT_AT', {
+            domain: process.env.NODE_ENV === 'prod' ? process.env.CLIENT.split('//')[1] : 'localhost',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'prod',
+            sameSite: process.env.NODE_ENV === 'prod' ? 'none' : null,
+          });
+    
+          res.clearCookie('__OTT_RT', {
+            domain: process.env.NODE_ENV === 'prod' ? process.env.CLIENT.split('//')[1] : 'localhost',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'prod',
+            sameSite: process.env.NODE_ENV === 'prod' ? 'none' : null,
+          });
+    
+          return res.json({ success: true });
+        } 
+        catch (err) 
+        {
+          throw new InternalServerErrorException('Error while logging out');
+        }
+    }
+
+    async refresh(req: Request, res: Response): Promise<Response> {
+        try {
+          const auth = await this.authModel.findOne({refreshToken: req.cookies['__OTT_RT']});
+    
+          if (!auth || new Date() > auth.refreshTokenExpiresAt) {
+            throw new UnauthorizedException('Invalid refresh token');
+          }
+    
+          return this.getToken(auth, res);
+        } 
+        catch (err) 
+        {
+          throw new UnauthorizedException('Invalid refresh token');
+        }
+    }
+
+    async fetchSession(req: AuthenticatedRequest): Promise<AuthenticatedRequest> {
+        try {
+          return req.user
+        }
+        catch(err)
+        {
+          throw new UnauthorizedException('Invalid refresh token');
+        }
+    }
+
+    // Helpers
+
+    private async getToken(auth: AuthDocument, res: Response) {
         const payload = {
           id: auth._id,
           mobile: auth.mobile,
-          fullname: auth.fullname,
-          email: auth.email,
-          country: auth.country,
-          fathersName: auth.fathersName,
-          mothersName: auth.mothersName,
-          dob: auth.dob,
-          gender: auth.gender
-        };
+          fullname: auth.fullname
+        }
     
         const accessToken = await this.jwtService.signAsync(payload, { expiresIn: EXPIRES.AT });
         const refreshToken = uuidv4();

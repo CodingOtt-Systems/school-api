@@ -21,14 +21,12 @@ export class Auth {
     mobile: string;
 
     @Prop({
-        required: true,
         trim: true
     })
     refreshToken: string;
     
     @Prop({
-        type: Date,
-        required: true
+        type: Date
     })
     refreshTokenExpiresAt: Date;
 }
