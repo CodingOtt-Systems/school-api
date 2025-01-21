@@ -50,8 +50,8 @@ export class CreateSchoolDto {
   @IsNotEmpty()
   pincode: number;
 
-  @IsNotEmpty()
-  user: Types.ObjectId;
+  @IsOptional()
+  user?: Types.ObjectId;
 }
 
 export class UpdateSchoolDto {

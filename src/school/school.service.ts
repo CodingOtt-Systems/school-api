@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { School, SchoolDocument } from './school.schema';
 import { CreateSchoolDto, UpdateSchoolDto } from './school.dto';
+import { AuthenticatedRequest } from 'src/auth/auth.guard';
 
 @Injectable()
 export class SchoolService {
@@ -10,8 +11,9 @@ export class SchoolService {
     @InjectModel(School.name) private readonly schoolModel: Model<SchoolDocument>,
   ) {}
 
-  async createSchool(createSchoolDto: CreateSchoolDto): Promise<SchoolDocument> {
+  async createSchool(createSchoolDto: CreateSchoolDto, req: AuthenticatedRequest): Promise<SchoolDocument> {
     try {
+      createSchoolDto.user = req.user.id
       const newSchool = new this.schoolModel(createSchoolDto);
       return await newSchool.save();
     } 

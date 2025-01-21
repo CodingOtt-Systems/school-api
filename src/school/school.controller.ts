@@ -1,14 +1,16 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, Query, Req, UseGuards } from '@nestjs/common';
 import { SchoolService } from './school.service';
 import { CreateSchoolDto, UpdateSchoolDto } from './school.dto';
+import { AuthenticatedRequest, AuthGuard } from 'src/auth/auth.guard';
 
-@Controller('schools')
+@Controller('school')
 export class SchoolController {
   constructor(private readonly schoolService: SchoolService) {}
 
   @Post()
-  createSchool(@Body() createSchoolDto: CreateSchoolDto) {
-    return this.schoolService.createSchool(createSchoolDto);
+  @UseGuards(AuthGuard)
+  createSchool(@Body() createSchoolDto: CreateSchoolDto, @Req() req: AuthenticatedRequest) {
+    return this.schoolService.createSchool(createSchoolDto, req);
   }
 
   @Get()

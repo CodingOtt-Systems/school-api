@@ -8,12 +8,12 @@ export interface AuthenticatedRequest extends Request {
 }
 
 @Injectable()
-export class UserGuard implements CanActivate {
+export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest() as AuthenticatedRequest;
-    const token = request.cookies['__OTT_AT'];
+    const token = request.cookies['__T'];
     
     if (!token) 
       throw new UnauthorizedException('TOKEN_VALIDATION_FAILED');
@@ -41,7 +41,7 @@ export class SessionGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest() as AuthenticatedRequest;
-    const token: any = request.cookies['__OTT_AT'] || request.headers['x-access-token'];
+    const token: any = request.cookies['__T'] || request.headers['x-access-token'];
     
     if (!token) 
       throw new UnauthorizedException('TOKEN_VALIDATION_FAILED');
