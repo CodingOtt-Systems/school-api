@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
     const token = request.cookies['__T'];
     
     if (!token) 
-      throw new UnauthorizedException('TOKEN_VALIDATION_FAILED');
+      throw new UnauthorizedException('TOKEN_VALIDATION_FAILED1');
 
     try {
       const payload = await this.jwtService.verifyAsync(
@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
     } 
     catch(err) 
     {
-      throw new UnauthorizedException('TOKEN_VALIDATION_FAILED');
+      throw new UnauthorizedException('TOKEN_VALIDATION_FAILED2');
     }
     return true;
   }

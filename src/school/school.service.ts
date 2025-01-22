@@ -13,11 +13,12 @@ export class SchoolService {
 
   async createSchool(createSchoolDto: CreateSchoolDto, req: AuthenticatedRequest): Promise<SchoolDocument> {
     try {
-      createSchoolDto.user = req.user.id
+      // createSchoolDto.user = req.user.id
       const newSchool = new this.schoolModel(createSchoolDto);
       return await newSchool.save();
     } 
     catch (error) {
+      console.log(error)
       throw new InternalServerErrorException('Failed to create school');
     }
   }

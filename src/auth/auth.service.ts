@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Auth, AuthDocument } from './auth.schema';
 import { Model } from 'mongoose';
@@ -28,7 +28,11 @@ export class AuthService {
         }
         catch(error)
         {
-            throw new InternalServerErrorException(error)
+          if (error.code === 11000) {
+            throw new ConflictException('User with this mobile already exists');
+          }
+
+          throw new InternalServerErrorException(error)
         }
     }
 
