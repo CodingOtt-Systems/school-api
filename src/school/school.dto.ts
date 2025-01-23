@@ -1,105 +1,117 @@
-import { IsString, IsNotEmpty, IsOptional, IsEmail, IsNumber } from 'class-validator';
-import { Types } from 'mongoose';
+import { IsString, IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
 
 export class CreateSchoolDto {
-  @IsOptional()
-  @IsString()
-  logo?: string;
+    @IsString()
+    @IsOptional()
+    regNo?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  title: string;
+    @IsString()
+    @IsOptional()
+    logo?: string;
 
-  @IsOptional()
-  @IsString()
-  description?: string;
+    @IsNotEmpty()
+    @IsString()
+    name: string;
 
-  @IsString()
-  @IsNotEmpty()
-  director: string;
+    @IsString()
+    @IsOptional()
+    description?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  mobile: string;
+    @IsNotEmpty()
+    @IsString()
+    director: string;
 
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+    @IsNotEmpty()
+    @IsString()
+    mobile: string;
 
-  @IsOptional()
-  @IsString()
-  regNo?: string;
+    @IsString()
+    @IsOptional()
+    whatsApp?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  address: string;
+    @IsString()
+    @IsOptional()
+    email?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  city: string;
+    @IsString()
+    @IsOptional()
+    website?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  state: string;
+    @IsString()
+    @IsOptional()
+    address?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  country: string;
+    @IsString()
+    @IsOptional()
+    city?: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  pincode: number;
+    @IsString()
+    @IsOptional()
+    state?: string;
 
-  @IsOptional()
-  user?: Types.ObjectId;
+    @IsString()
+    @IsOptional()
+    country?: string;
+
+    @IsNumber()
+    @IsOptional()
+    pincode?: number;
 }
 
 export class UpdateSchoolDto {
-  @IsOptional()
-  @IsString()
-  logo?: string;
+    @IsString()
+    @IsOptional()
+    regNo?: string;
 
-  @IsOptional()
-  @IsString()
-  title?: string;
+    @IsString()
+    @IsOptional()
+    logo?: string;
 
-  @IsOptional()
-  @IsString()
-  description?: string;
+    @IsString()
+    @IsOptional()
+    name?: string;
 
-  @IsOptional()
-  @IsString()
-  director?: string;
+    @IsString()
+    @IsOptional()
+    description?: string;
 
-  @IsOptional()
-  @IsString()
-  mobile?: string;
+    @IsString()
+    @IsOptional()
+    director?: string;
 
-  @IsOptional()
-  @IsEmail()
-  email?: string;
+    @IsString()
+    @IsOptional()
+    mobile?: string;
 
-  @IsOptional()
-  @IsString()
-  regNo?: string;
+    @IsString()
+    @IsOptional()
+    whatsApp?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  address: string;
+    @IsString()
+    @IsOptional()
+    email?: string;
 
-  @IsOptional()
-  @IsString()
-  city?: string;
+    @IsString()
+    @IsOptional()
+    website?: string;
 
-  @IsOptional()
-  @IsString()
-  state?: string;
+    @IsString()
+    @IsOptional()
+    address?: string;
 
-  @IsOptional()
-  @IsString()
-  country?: string;
+    @IsString()
+    @IsOptional()
+    city?: string;
 
-  @IsOptional()
-  @IsNumber()
-  pincode?: number;
+    @IsString()
+    @IsOptional()
+    state?: string;
+
+    @IsString()
+    @IsOptional()
+    country?: string;
+
+    @IsNumber()
+    @IsOptional()
+    pincode?: number;
 }

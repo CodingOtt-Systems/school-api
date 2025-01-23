@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsPhoneNumber, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsPhoneNumber, IsOptional, IsIn } from 'class-validator';
 
 export class SendOtpDto {
     @IsNotEmpty()
@@ -20,4 +20,11 @@ export class VerifyOtpDto {
     @IsNotEmpty()
     @IsString()
     otp: string;
+}
+
+export class OtpTypeQueryDto {
+  @IsNotEmpty()
+  @IsString()
+  @IsIn(['signup', 'login'], {message: 'Invalid otp type from dto'})
+  type: string;
 }

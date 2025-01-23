@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { School, SchoolDocument } from './school.schema';
@@ -11,22 +11,26 @@ export class SchoolService {
     @InjectModel(School.name) private readonly schoolModel: Model<SchoolDocument>,
   ) {}
 
-  async createSchool(createSchoolDto: CreateSchoolDto, req: AuthenticatedRequest): Promise<SchoolDocument> {
+  async createSchool(createSchoolDto: CreateSchoolDto): Promise<SchoolDocument> {
     try {
-      // createSchoolDto.user = req.user.id
       const newSchool = new this.schoolModel(createSchoolDto);
-      return await newSchool.save();
+      return await newSchool.save()
     } 
-    catch (error) {
-      console.log(error)
+    catch (error) {     
+      if (error.code === 11000) {
+        throw new ConflictException('School already exists with this acount');
+      }
+
       throw new InternalServerErrorException('Failed to create school');
     }
   }
 
-  async fetchSchools(page: number, limit: number): Promise<{data: SchoolDocument[], total: number}> {
+  async fetchSchools(page: number, limit: number, req: AuthenticatedRequest): Promise<SchoolDocument | {data: SchoolDocument[], total: number}> {
     try {
-      const skip = (page - 1) * limit;
+      if(req.user)
+        return await this.schoolModel.findOne({user: req.user.id}).sort({createdAt: -1})
 
+      const skip = (page - 1) * limit;
       const [data, total] = await Promise.all([
         this.schoolModel.find().skip(skip).limit(limit),
         this.schoolModel.countDocuments(),

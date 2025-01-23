@@ -1,21 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
 export type SchoolDocument = HydratedDocument<School>;
 
 @Schema({ timestamps: true })
 export class School {
-    @Prop({ type: mongoose.Types.ObjectId, ref: 'Auth', required: true })
-    user: mongoose.Types.ObjectId;
-
-    @Prop({ type: String, trim: true, lowercase: true })
+    @Prop({ type: String, trim: true })
     regNo: string;
 
     @Prop({ type: String, trim: true, lowercase: true })
     logo: string;
 
     @Prop({ type: String, trim: true, lowercase: true, required: true })
-    title: string;
+    name: string;
 
     @Prop({ type: String, trim: true, lowercase: true })
     description: string;
@@ -26,22 +23,28 @@ export class School {
     @Prop({ type: String, trim: true, required: true })
     mobile: string;
 
-    @Prop({ type: String, trim: true, required: true })
+    @Prop({ type: String, trim: true })
+    whatsApp: string;
+
+    @Prop({ type: String, trim: true })
     email: string;
 
-    @Prop({ type: String, trim: true, lowercase: true, required: true })
+    @Prop({ type: String, trim: true })
+    website: string;
+
+    @Prop({ type: String, trim: true, lowercase: true })
     address: string;
 
-    @Prop({ type: String, trim: true, lowercase: true, required: true })
+    @Prop({ type: String, trim: true, lowercase: true })
     city: string;
 
-    @Prop({ type: String, trim: true, lowercase: true, required: true })
+    @Prop({ type: String, trim: true, lowercase: true })
     state: string;
 
-    @Prop({ type: String, trim: true, lowercase: true, required: true })
+    @Prop({ type: String, trim: true, lowercase: true })
     country: string;
 
-    @Prop({ type: Number, required: true })
+    @Prop({ type: Number })
     pincode: number;
 }
 

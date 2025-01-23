@@ -1,12 +1,13 @@
-import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Auth, AuthDocument } from './auth.schema';
-import { Model } from 'mongoose';
-import { SignupDto } from './auth.dto';
+import { AuthDocument } from './auth.schema';
+import mongoose, { Model } from 'mongoose';
+import { LoginDto, SignupDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { Request, Response } from 'express';
 import { AuthenticatedRequest } from './auth.guard';
+import { SchoolService } from 'src/school/school.service';
 
 const EXPIRES = {
     AT: (30 * 24 * 60 * 60) * 1000, // 30 Days in milliseconds
@@ -17,12 +18,14 @@ const EXPIRES = {
 export class AuthService {
     constructor(
         @InjectModel('Auth') private readonly authModel: Model<AuthDocument>,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private readonly schoolService: SchoolService
     ) {}
 
-    async signup(signupDto: SignupDto, res: Response) : Promise<Response>{
+    async signup(body: SignupDto, res: Response) : Promise<Response>{
         try {
-            const auth = new this.authModel(signupDto)
+            const school = await this.schoolService.createSchool(body)
+            const auth = new this.authModel({mobile: body.mobile, school: school._id})
             await auth.save()
             return this.getToken(auth, res)
         }
@@ -36,16 +39,30 @@ export class AuthService {
         }
     }
 
+    async login(body: LoginDto, res: Response) : Promise<Response>{
+      try {
+        const auth = await this.authModel.findOne({mobile: body.mobile})
+        if(!auth)
+          throw new NotFoundException("User doesn`t exist please signup to continue")
+
+        return this.getToken(auth, res)
+      }
+      catch(error)
+      {
+        throw new InternalServerErrorException(error.message)
+      }
+  }
+
     async logout(req: Request, res: Response): Promise<Response> {
         try {      
-          res.clearCookie('__OTT_AT', {
+          res.clearCookie('__T', {
             domain: process.env.NODE_ENV === 'prod' ? process.env.CLIENT.split('//')[1] : 'localhost',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'prod',
             sameSite: process.env.NODE_ENV === 'prod' ? 'none' : null,
           });
     
-          res.clearCookie('__OTT_RT', {
+          res.clearCookie('__R', {
             domain: process.env.NODE_ENV === 'prod' ? process.env.CLIENT.split('//')[1] : 'localhost',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'prod',
@@ -87,12 +104,22 @@ export class AuthService {
     }
 
     // Helpers
+    async isUserExist(mobile: string): Promise<Boolean> {
+      try {
+        const count = await this.authModel.countDocuments({mobile})
+        return count > 0
+      }
+      catch(err)
+      {
+        return false
+      }
+    }
 
     private async getToken(auth: AuthDocument, res: Response) {
         const payload = {
           id: auth._id,
           mobile: auth.mobile,
-          fullname: auth.fullname
+          school: auth.school
         }
     
         const accessToken = await this.jwtService.signAsync(payload, { expiresIn: EXPIRES.AT });
@@ -122,5 +149,20 @@ export class AuthService {
         });
     
         return res.json(payload);
+    }
+
+    async addSchool(schoolId: mongoose.Types.ObjectId, userId: string): Promise<{message: string}> {
+      try {
+        const auth = await this.authModel.findByIdAndUpdate(userId, {school: schoolId})
+
+        if(!auth)
+          throw new NotFoundException("User not found")
+
+        return {message: 'School added successfully'}
+      }
+      catch(err)
+      {
+        throw new InternalServerErrorException("Failed to add school")
+      }
     }
 }

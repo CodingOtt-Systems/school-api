@@ -1,9 +1,13 @@
-import { IsString, IsEmail, IsOptional, IsDateString, Length, IsNotEmpty } from 'class-validator';
+import { IsString, IsEmail, IsOptional, IsDateString, Length, IsNotEmpty, IsNumber, IsIn } from 'class-validator';
 
 export class SignupDto {
     @IsNotEmpty()
     @IsString()
-    fullname: string;
+    director: string;
+
+    @IsNotEmpty()
+    @IsString()
+    name: string;
 
     @IsNotEmpty()
     @IsString()
@@ -18,20 +22,8 @@ export class SignupDto {
     refreshTokenExpiresAt?: Date;
 }
 
-export class UpdateAuthDto {
-  @IsOptional()
+export class LoginDto {
+  @IsNotEmpty()
   @IsString()
-  fullname?: string;
-
-  @IsOptional()
-  @IsString()
-  mobile?: string;
-
-  @IsOptional()
-  @IsString()
-  refreshToken?: string;
-
-  @IsOptional()
-  @IsDateString()
-  refreshTokenExpiresAt?: Date;
+  mobile: string;
 }

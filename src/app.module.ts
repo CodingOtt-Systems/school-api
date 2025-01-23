@@ -29,7 +29,9 @@ import { MsgModule } from './msg/msg.module';
     ClassesModule, 
     SoundModule,
     AuthModule, 
-    DigitalOceanModule, SchoolModule, MsgModule
+    DigitalOceanModule, 
+    SchoolModule, 
+    MsgModule
   ],
 })
 export class AppModule {}

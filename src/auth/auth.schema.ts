@@ -1,16 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type AuthDocument = HydratedDocument<Auth>;
 
 @Schema({ timestamps: true })
 export class Auth {
-    @Prop({
-        trim: true,
-        lowercase: true,
-        required: true
+    @Prop({ 
+        type: mongoose.Types.ObjectId, 
+        ref: 'School', 
+        required: true, 
+        unique: true, 
+        index: true
     })
-    fullname: string;
+    school: mongoose.Types.ObjectId;
 
     @Prop({
         trim: true,
