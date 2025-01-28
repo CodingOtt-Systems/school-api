@@ -13,6 +13,12 @@ import { DigitalOceanModule } from './digital-ocean/digital-ocean.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SchoolModule } from './school/school.module';
 import { MsgModule } from './msg/msg.module';
+import { DesignationModule } from './designation/designation.module';
+import { EmployeeModule } from './employee/employee.module';
+import { ExpenseModule } from './expense/expense.module';
+import { SalaryModule } from './salary/salary.module';
+import { AllowanceModule } from './allowance/allowance.module';
+import { TaxModule } from './tax/tax.module';
 
 @Module({
   controllers: [AppController],
@@ -31,7 +37,7 @@ import { MsgModule } from './msg/msg.module';
     AuthModule, 
     DigitalOceanModule, 
     SchoolModule, 
-    MsgModule
+    MsgModule, DesignationModule, EmployeeModule, ExpenseModule, SalaryModule, AllowanceModule, TaxModule
   ],
 })
 export class AppModule {}

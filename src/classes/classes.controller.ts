@@ -6,31 +6,37 @@ import {
   Delete,
   Param,
   Body,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ClassesService } from './classes.service';
-import { ClassesDocument } from './classes.schema';
 import { CreateClassesDto, UpdateClassesDto } from './classes.dto';
+import { AuthenticatedRequest, AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('classes')
 export class ClassesController {
   constructor(private readonly classesService: ClassesService) {}
 
   @Post()
-  createClasses(@Body() createClassesDto: CreateClassesDto) {
-    return this.classesService.createClasses(createClassesDto);
+  @UseGuards(AuthGuard)
+  createClasses(@Body() createClassesDto: CreateClassesDto, @Req() req: AuthenticatedRequest) {
+    return this.classesService.createClasses(createClassesDto, req);
   }
 
   @Get()
-  fetchClasses() {
-    return this.classesService.fetchClasses();
+  @UseGuards(AuthGuard)
+  fetchClasses(@Req() req: AuthenticatedRequest) {
+    return this.classesService.fetchClasses(req);
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   fetchClassesById(@Param('id') id: string) {
     return this.classesService.fetchClassesById(id);
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard)
   updateClasses(
     @Param('id') id: string,
     @Body() updateClassesDto: UpdateClassesDto,
@@ -39,6 +45,7 @@ export class ClassesController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   deleteClasses(@Param('id') id: string) {
     return this.classesService.deleteClasses(id);
   }
